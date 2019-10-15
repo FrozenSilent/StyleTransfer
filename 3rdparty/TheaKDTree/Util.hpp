@@ -43,8 +43,8 @@
 #define __Thea_Util_hpp__
 
 #include "Vector3.hpp"
-//#include <boost/utility/enable_if.hpp>
-//#include <boost/type_traits.hpp>
+#include <boost/utility/enable_if.hpp>
+#include <boost/type_traits.hpp>
 #include <algorithm>
 #include <cmath>
 #include <cstdlib>
@@ -93,7 +93,7 @@ namespace FastCopyInternal {
 
 template <typename I1, typename I2, bool b>
 I2
-fastCopyImpl(I1 first, I1 last, I2 out, std::integral_constant<bool, b> const &)
+fastCopyImpl(I1 first, I1 last, I2 out, boost::integral_constant<bool, b> const &)
 {
   while (first != last) *(out++) = *(first++);
   return out;
@@ -101,7 +101,7 @@ fastCopyImpl(I1 first, I1 last, I2 out, std::integral_constant<bool, b> const &)
 
 template <typename T>
 T *
-fastCopyImpl(T const * first, T const * last, T * out, std::true_type const &)
+fastCopyImpl(T const * first, T const * last, T * out, boost::true_type const &)
 {
    memcpy(out, first, (last - first) * sizeof(T));
    return out + (last - first);
@@ -110,7 +110,7 @@ fastCopyImpl(T const * first, T const * last, T * out, std::true_type const &)
 // Same semantics as std::copy, calls memcpy where appropriate.
 template <typename I1, typename I2, bool b>
 I2
-fastCopyBackwardImpl(I1 first, I1 last, I2 out, std::integral_constant<bool, b> const &)
+fastCopyBackwardImpl(I1 first, I1 last, I2 out, boost::integral_constant<bool, b> const &)
 {
   while (last != first) *(--out) = *(--last);
   return out;
@@ -118,7 +118,7 @@ fastCopyBackwardImpl(I1 first, I1 last, I2 out, std::integral_constant<bool, b> 
 
 template <typename T>
 T *
-fastCopyBackwardImpl(T const * first, T const * last, T * out, std::true_type const &)
+fastCopyBackwardImpl(T const * first, T const * last, T * out, boost::true_type const &)
 {
    memmove(out, first, (last - first) * sizeof(T));
    return out;
@@ -142,7 +142,7 @@ fastCopy(I1 first, I1 last, I2 out)
   // requirement we detect with overload resolution):
   //
   typedef typename std::iterator_traits<I1>::value_type value_type;
-  return FastCopyInternal::fastCopyImpl(first, last, out, std::has_trivial_assign<value_type>());
+  return FastCopyInternal::fastCopyImpl(first, last, out, boost::has_trivial_assign<value_type>());
 }
 
 /**
@@ -156,7 +156,7 @@ inline I2
 fastCopyBackward(I1 first, I1 last, I2 out)
 {
   typedef typename std::iterator_traits<I1>::value_type value_type;
-  return FastCopyInternal::fastCopyBackwardImpl(first, last, out, std::has_trivial_assign<value_type>());
+  return FastCopyInternal::fastCopyBackwardImpl(first, last, out, boost::has_trivial_assign<value_type>());
 }
 
 /**
